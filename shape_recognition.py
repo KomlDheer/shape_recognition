@@ -9,7 +9,7 @@ Original file is located at
 #Mathematical Shape Recognition
 """
 
-!pip install streamlit
+#!pip install streamlit
 
 import math
 import random
