@@ -14,7 +14,6 @@ Original file is located at
 import math
 import random
 from PIL import Image, ImageDraw
-import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import pandas as pd
@@ -22,7 +21,10 @@ from sklearn.model_selection import train_test_split
 import streamlit as st
 import joblib
 
+from features import FEATURE_NAMES, extract_shapes
+
 def generate_shape(shape_type, img_size=128):
+
     img = Image.new("RGB", (img_size, img_size), "white")
     draw = ImageDraw.Draw(img)
 
@@ -75,42 +77,8 @@ def generate_shape(shape_type, img_size=128):
     elif shape_type == "Ellipse":
         draw.ellipse([center - max_radius, center - int(max_radius * 0.6), center + max_radius, center + int(max_radius * 0.6)], fill=fill_color, outline=outline_color, width=2)
 
-    return img
-
-test_image = generate_shape("Pentagon", img_size=128)
-test_image.show()
-plt.imshow(test_image)
-
-def extract_shape_metrics(img):
-    img=np.array(img)
-    img=cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-    _, thresh = cv2.threshold(img, 240, 255, cv2.THRESH_BINARY_INV)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contour = max(contours, key=cv2.contourArea)
-    perimeter = cv2.arcLength(contour, True)
-    epsilon = 0.02 * perimeter
-    approx = cv2.approxPolyDP(contour, epsilon, True)
-    corner_count = len(approx)
-
-    x, y, w, h = cv2.boundingRect(contour)
-    aspect_ratio = float(w) / h
-
-    area = cv2.contourArea(contour)
-    bounding_box_area = w * h
-    extent = float(area) / bounding_box_area
-
-    hull = cv2.convexHull(contour)
-    hull_area = cv2.contourArea(hull)
-    solidity = float(area) / hull_area if hull_area > 0 else 0
-
-    moments = cv2.moments(contour)
-    hu_moments = cv2.HuMoments(moments).flatten()
-
-    hu_log = -np.sign(hu_moments) * np.log10(np.abs(hu_moments) + 1e-10)
-
-    feature_vector = [corner_count, aspect_ratio, extent, solidity] + list(hu_log)
-    return feature_vector
-joblib.dump(extract_shape_metrics,'extract_shape_metrics.pkl')
+    final_img=np.array(img)
+    return final_img
 
 #augmentation
 def augment_image(image):
@@ -123,7 +91,7 @@ def augment_image(image):
         angle,
         scale
     )
-    image = cv2.warpAffine(image, M_rot, (cols, rows))
+    image = cv2.warpAffine(image, M_rot, (cols, rows), borderValue=(255, 255, 255))
 
     tx = np.random.uniform(-0.10, 0.10) * cols
     ty = np.random.uniform(-0.10, 0.10) * rows
@@ -135,7 +103,8 @@ def augment_image(image):
     image = cv2.warpAffine(
         image,
         M_translate,
-        (cols, rows)
+        (cols, rows),
+        borderValue=(255, 255, 255),
     )
     return image
 
@@ -147,14 +116,14 @@ def get_features_labels():
   for shape in my_shapes:
     for i in range(15):
       shp=generate_shape(shape)
-      features.append(extract_shape_metrics(shp))
+      features.append(extract_shapes(shp))
       labels.append(shape)
       for i in range(15):
         # Convert PIL Image to NumPy array before augmentation
-        new_shp=extract_shape_metrics(augment_image(np.array(shp)))
+        new_shp=extract_shapes(augment_image(shp))
         features.append(new_shp)
         labels.append(shape)
-  features=pd.DataFrame(features,columns=['corners','aspect_ratio','extent','solidity','hu1','hu2','hu3','hu4','hu5','hu6','hu7'])
+  features=pd.DataFrame(features,columns=FEATURE_NAMES)
   return features,labels
 features,labels=get_features_labels()
 
@@ -168,12 +137,14 @@ from sklearn.metrics import accuracy_score,classification_report,confusion_matri
 def get_tree_model():
   tree_model=DecisionTreeClassifier(min_samples_split=4,random_state=0)
   tree_model.fit(X_train,y_train)
+  return tree_model
 tree_model=get_tree_model()
 
 @st.cache_resource
 def get_knn_model():
   knn_model=KNeighborsClassifier(n_neighbors=5)
   knn_model.fit(X_train,y_train)
+  return knn_model
 knn_model=get_knn_model()
 
 joblib.dump(tree_model,'decision_tree_model.pkl')
