@@ -27,10 +27,10 @@ st.markdown(
 )
 
 MODEL_PATHS = {
-    "Decision Tree": "decision_tree_model.pkl",
-    "K Nearest Neighbors": "knn_model.pkl",
-    "Random Forest": "random_forest_model.pkl",
-    "Support Vector Machine": "svc_model.pkl",
+    "Decision Tree": "decision_tree_final.pkl",
+    "K Nearest Neighbors": "knn_final.pkl",
+    "Random Forest": "random_forest_final.pkl",
+    "Support Vector Machine": "svc_final.pkl",
 }
 
 st.sidebar.selectbox(
