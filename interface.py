@@ -69,9 +69,9 @@ def predict_image(image, project, model_name):
     if(project=="Emoji Prediction"):
         model = load_model(MODEL_PATHS[model_name])
     elif (model_name=="Decision Tree"):
-        model=get_tree_model
+        model=get_tree_model()
     else:
-        model=get_knn_model
+        model=get_knn_model()
     features = (
         extract_shapes(image)
         if project == "Shape Prediction"
