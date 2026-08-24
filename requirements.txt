@@ -6,3 +6,4 @@ pandas
 scikit-learn
 joblib
 scikit-image
+requests
