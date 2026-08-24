@@ -9,6 +9,7 @@ import os
 from PIL import Image
 from skimage.feature import hog
 from skimage.exposure import rescale_intensity
+from shape_recognition import get_tree_model,get_knn_model
 from features import extract_hog_emojis, extract_shapes
 
 st.markdown(
@@ -30,8 +31,6 @@ st.markdown(
 )
 
 MODEL_PATHS = {
-    "Decision Tree": "decision_tree_final.pkl",
-    "K Nearest Neighbors": "knn_final.pkl",
     "Random Forest": "random_forest_final.pkl",
     "Support Vector Machine": "svc_final.pkl",
 }
@@ -67,7 +66,12 @@ def model_probabilities(model, features):
     return None
 
 def predict_image(image, project, model_name):
-    model = load_model(MODEL_PATHS[model_name])
+    if(project=="Emoji Prediction"):
+        model = load_model(MODEL_PATHS[model_name])
+    elif (model_name=="Decision Tree"):
+        model=get_tree_model
+    else:
+        model=get_knn_model
     features = (
         extract_shapes(image)
         if project == "Shape Prediction"
