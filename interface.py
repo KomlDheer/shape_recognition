@@ -78,9 +78,9 @@ def predict_image(image, project, model_name):
 #====================================================================================================
 @st.cache_resource
 def load_model(path):
-    url = "https://github.com/KomlDheer/shape_recognition/releases/tag/v1.0.0"
-    model_path = "path"
-    
+    url = "https://github.com/KomlDheer/shape_recognition/releases/download/v1.0.0"
+    model_path = path
+    url=os.path.join(url,model_path)
     try:
         response = requests.get(url)
         # Check if the HTTP request was successful (Status 200)
