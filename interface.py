@@ -80,7 +80,7 @@ def predict_image(image, project, model_name):
 def load_model(path):
     url = "https://github.com/KomlDheer/shape_recognition/releases/download/v1.0.0"
     model_path = path
-    url=os.path.join(url,model_path)
+    url=f"{url}/{model_path}"
     try:
         response = requests.get(url)
         # Check if the HTTP request was successful (Status 200)
