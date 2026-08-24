@@ -57,8 +57,8 @@ else:
 
 
 @st.cache_resource
-# def load_model(path):
-#     return joblib.load(path)
+def load_model(path):
+    return joblib.load(path)
 
 def model_probabilities(model, features):
     if hasattr(model, "predict_proba"):
@@ -75,27 +75,6 @@ def predict_image(image, project, model_name):
     )
     prediction = model.predict([features])[0]
     return prediction, model_probabilities(model, features)
-#====================================================================================================
-@st.cache_resource
-def load_model(path):
-    url = "https://github.com/KomlDheer/shape_recognition/releases/download/v1.0.0"
-    model_path = path
-    url=f"{url}/{model_path}"
-    try:
-        response = requests.get(url)
-        # Check if the HTTP request was successful (Status 200)
-        if response.status_code == 200:
-            with open(model_path, "wb") as f:
-                f.write(response.content)
-            
-            with open(model_path, "rb") as f:
-                return pickle.load(f)
-        else:
-            st.error(f"Failed to download model. HTTP Status: {response.status_code}")
-            return None
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        return None
 
 
 image_input = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
