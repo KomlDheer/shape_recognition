@@ -68,7 +68,7 @@ def model_probabilities(model, features):
 
 def predict_image(image, project, model_name):
     if(project=="Emoji Prediction"):
-       if(model_name=="Random Forest":
+       if(model_name=="Random Forest"):
          model=get_rf_model()
        else:
          model=get_svc_model()
