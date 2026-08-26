@@ -8,10 +8,10 @@ Original file is located at
 """
 
 from zipfile import ZipFile
-zip_path = "/content/emojis.zip"
+zip_path = "my_emojis.zip"
 
 with ZipFile(zip_path, 'r') as zip_ref:
-    zip_ref.extractall("/content")
+    zip_ref.extractall()
 
 import pandas as pd
 import numpy as np
@@ -64,12 +64,12 @@ def augment_image(image):
     )
     return image
 
-IMG_SIZE = (128, 128)
+IMG_SIZE = (228, 228)
 
 
 images_org=[]
 labels_org=[]
-emoji_dir='/content/emojis'
+emoji_dir='my_emojis'
 
 for emotion in os.listdir(emoji_dir):
   path=os.path.join(emoji_dir,emotion)
@@ -95,9 +95,12 @@ for img,lbl in zip(images_org,labels_org):
 
 X_train,X_test,y_train,y_test=train_test_split(images,labels,test_size=0.2,random_state=8,stratify=labels)
 
-svm_model = SVC(kernel='linear',random_state=42, max_iter=2000)
-svm_model.fit(X_train, y_train)
-
+@st.cache_resource
+def get_svc_model():
+    svm_model = SVC(kernel='linear',random_state=42, max_iter=2000)
+    svm_model.fit(X_train, y_train)
+    return svm_model
+svm_model=get_svc_model()
 def show_accuracy(model,Xtest):
   y_pred = model.predict(Xtest)
   print(f"Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%")
@@ -106,9 +109,12 @@ def show_accuracy(model,Xtest):
 
 show_accuracy(svm_model,X_test)
 
-model=RandomForestClassifier(n_estimators=100)
-random_forest_model=RandomForestClassifier(n_estimators=100,random_state=8)
-random_forest_model.fit(X_train,y_train)
+@st.cache_resource
+def get_rf_model():
+    random_forest_model=RandomForestClassifier(n_estimators=100,random_state=8)
+    random_forest_model.fit(X_train,y_train)
+    return random_forest_model
+random_forest_model=get_rf_model()
 show_accuracy(random_forest_model,X_test)
 
 import joblib
