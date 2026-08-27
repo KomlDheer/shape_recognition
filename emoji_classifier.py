@@ -18,6 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from skimage.feature import hog
+import streamlit as st
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC,SVC
@@ -72,12 +73,13 @@ labels_org=[]
 emoji_dir='my_emojis'
 
 for emotion in os.listdir(emoji_dir):
-  path=os.path.join(emoji_dir,emotion)
-  for image in os.listdir(path):
-    img_path=os.path.join(path,image)
-    im_read=cv2.imread(img_path)
-    images_org.append(im_read)
-    labels_org.append(emotion)
+    if(emotion!="desktop.ini"):
+        path=os.path.join(emoji_dir,emotion)
+        for image in os.listdir(path):
+        img_path=os.path.join(path,image)
+        im_read=cv2.imread(img_path)
+        images_org.append(im_read)
+        labels_org.append(emotion)
 
 images=[]
 labels=[]
