@@ -76,10 +76,10 @@ for emotion in os.listdir(emoji_dir):
     if(emotion!="desktop.ini"):
         path=os.path.join(emoji_dir,emotion)
         for image in os.listdir(path):
-        img_path=os.path.join(path,image)
-        im_read=cv2.imread(img_path)
-        images_org.append(im_read)
-        labels_org.append(emotion)
+            img_path=os.path.join(path,image)
+            im_read=cv2.imread(img_path)
+            images_org.append(im_read)
+            labels_org.append(emotion)
 
 images=[]
 labels=[]
