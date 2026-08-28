@@ -68,15 +68,15 @@ def model_probabilities(model, features):
 
 def predict_image(image, project, model_name):
     if(project=="Emoji Prediction"):
-       if(model_name=="Random Forest"):
-         model=get_rf_model()
-       else:
-         model=get_svc_model()
-      
-    elif (model_name=="Decision Tree"):
-        model=get_tree_model()
+        if(model_name=="Random Forest"):
+            model=get_rf_model()
+        else:
+            model=get_svc_model()
     else:
-        model=get_knn_model()
+        if(model_name=="Decision Tree"):
+            model=get_tree_model()
+        else:
+            model=get_knn_model()
     features = (
         extract_shapes(image)
         if project == "Shape Prediction"
