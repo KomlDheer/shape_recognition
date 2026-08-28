@@ -8,11 +8,6 @@ Original file is located at
 """
 
 from zipfile import ZipFile
-zip_path = "my_emojis.zip"
-
-with ZipFile(zip_path, 'r') as zip_ref:
-    zip_ref.extractall()
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +20,7 @@ from sklearn.svm import LinearSVC,SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from features import extract_hog_emojis
+import joblib
 
 """program taking image path as input and giving gray scale resized image"""
 
@@ -68,57 +64,55 @@ def augment_image(image):
 IMG_SIZE = (228, 228)
 
 
-images_org=[]
-labels_org=[]
-emoji_dir='my_emojis'
-
-for emotion in os.listdir(emoji_dir):
-    if(emotion!="desktop.ini"):
-        path=os.path.join(emoji_dir,emotion)
-        for image in os.listdir(path):
-            img_path=os.path.join(path,image)
-            im_read=cv2.imread(img_path)
-            images_org.append(im_read)
-            labels_org.append(emotion)
-
-images=[]
-labels=[]
-
-for img,lbl in zip(images_org,labels_org):
-  img_arr=[img]
-  lbl_arr=[lbl]
-  for i in range(100):
-    new_img=augment_image(img)
-    img_arr.append(new_img)
-    lbl_arr.append(lbl)
-  for image in img_arr:
-    images.append(extract_hog_emojis(image))
-    labels.append(lbl)
-
-X_train,X_test,y_train,y_test=train_test_split(images,labels,test_size=0.2,random_state=8,stratify=labels)
+def load_and_prepare_data():
+    """Load emoji images from zip, augment, and extract features"""
+    # Extract zip file if my_emojis directory doesn't exist
+    zip_path = "my_emojis.zip"
+    if not os.path.exists('my_emojis'):
+        with ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall()
+    
+    images_org=[]
+    labels_org=[]
+    emoji_dir='my_emojis'
+    
+    for emotion in os.listdir(emoji_dir):
+        if(emotion!="desktop.ini"):
+            path=os.path.join(emoji_dir,emotion)
+            for image in os.listdir(path):
+                img_path=os.path.join(path,image)
+                im_read=cv2.imread(img_path)
+                if im_read is not None:
+                    images_org.append(im_read)
+                    labels_org.append(emotion)
+    
+    images=[]
+    labels=[]
+    
+    for img,lbl in zip(images_org,labels_org):
+      img_arr=[img]
+      lbl_arr=[lbl]
+      for i in range(100):
+        new_img=augment_image(img)
+        img_arr.append(new_img)
+        lbl_arr.append(lbl)
+      for image in img_arr:
+        images.append(extract_hog_emojis(image))
+        labels.append(lbl)
+    
+    X_train,X_test,y_train,y_test=train_test_split(images,labels,test_size=0.2,random_state=8,stratify=labels)
+    return X_train, X_test, y_train, y_test
 
 @st.cache_resource
 def get_svc_model():
+    X_train, X_test, y_train, y_test = load_and_prepare_data()
     svm_model = SVC(kernel='linear',random_state=42, max_iter=2000)
     svm_model.fit(X_train, y_train)
     return svm_model
-svm_model=get_svc_model()
-def show_accuracy(model,Xtest):
-  y_pred = model.predict(Xtest)
-  print(f"Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%")
-  print("\nClassification Report:")
-  print(classification_report(y_test, y_pred))
-
-show_accuracy(svm_model,X_test)
 
 @st.cache_resource
 def get_rf_model():
+    X_train, X_test, y_train, y_test = load_and_prepare_data()
     random_forest_model=RandomForestClassifier(n_estimators=100,random_state=8)
     random_forest_model.fit(X_train,y_train)
     return random_forest_model
-random_forest_model=get_rf_model()
-show_accuracy(random_forest_model,X_test)
-
-import joblib
-joblib.dump(random_forest_model,'random_forest_model.pkl')
-joblib.dump(svm_model,'svm_model.pkl')
