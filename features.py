@@ -10,7 +10,6 @@ FEATURE_NAMES = [
     "aspect_ratio",
     "extent",
     "solidity",
-    "inner_contours",
     "circularity"
 ]
 
@@ -29,9 +28,9 @@ def extract_shapes(image):
     threshold = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, kernel, iterations=1)
     threshold = cv2.morphologyEx(threshold, cv2.MORPH_CLOSE, kernel, iterations=1)
 
-    # Get contours and hierarchy for inner-contour detection
-    contours, hierarchy = cv2.findContours(
-        threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+    # Get contours
+    contours, _ = cv2.findContours(
+        threshold, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
     )
     if not contours:
         raise ValueError("No shape was detected in the image")
@@ -42,10 +41,8 @@ def extract_shapes(image):
     large_contours = [c for c in contours if cv2.contourArea(c) >= min_area]
     if large_contours:
         contour = max(large_contours, key=cv2.contourArea)
-        main_idx = int([i for i, c in enumerate(contours) if np.array_equal(c, contour)][0])
     else:
         contour = max(contours, key=cv2.contourArea)
-        main_idx = int(np.argmax([cv2.contourArea(c) for c in contours]))
 
     perimeter = cv2.arcLength(contour, True)
     approximation = cv2.approxPolyDP(contour, 0.01 * perimeter, True)
@@ -59,19 +56,10 @@ def extract_shapes(image):
     hull_area = cv2.contourArea(cv2.convexHull(contour))
     solidity = float(area) / hull_area if hull_area else 0.0
 
-    # count immediate child contours (holes)
-    inner_count = 0
-    if hierarchy is not None:
-        hier = hierarchy[0]
-        for idx, h in enumerate(hier):
-            parent = int(h[3])
-            if parent == main_idx:
-                inner_count += 1
-
     # Calculate circularity
     circularity = 4 * np.pi * area / (perimeter ** 2) if perimeter else 0.0
 
-    return [corner_count, aspect_ratio, extent, solidity, inner_count, circularity]
+    return [corner_count, aspect_ratio, extent, solidity, circularity]
 
 
 def extract_hog_emojis(img):
