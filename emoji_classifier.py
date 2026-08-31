@@ -45,7 +45,7 @@ def augment_image(image):
         angle,
         scale
     )
-    image = cv2.warpAffine(image, M_rot, (cols, rows))
+    image = cv2.warpAffine(image, M_rot, (cols, rows),borderMode=cv2.BORDER_REPLICATE)
 
     tx = np.random.uniform(-0.10, 0.10) * cols
     ty = np.random.uniform(-0.10, 0.10) * rows
@@ -57,7 +57,8 @@ def augment_image(image):
     image = cv2.warpAffine(
         image,
         M_translate,
-        (cols, rows)
+        (cols, rows),
+        borderMode=cv2.BORDER_REPLICATE
     )
     return image
 
