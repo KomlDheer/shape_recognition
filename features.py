@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from skimage.feature import hog
 
-IMG_SIZE = (64, 64)
+IMG_SIZE = (128, 128)
 
 FEATURE_NAMES = [
     "corners",
