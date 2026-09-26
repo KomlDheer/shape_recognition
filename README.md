@@ -1,6 +1,14 @@
-# Shape Recognition
+# Shape/Emoji Recognition
 
 A Python-based machine learning project for recognizing geometric shapes and emoji-like visual classes using feature extraction and classification models.
+<p float="left">
+<img width=48% height=auto alt="Screenshot 2026-09-26 141335" src="https://github.com/user-attachments/assets/a5a2299e-3944-43e3-b5c5-afe9fe29d67f" />
+<img width="48% height=auto alt="Screenshot 2026-09-26 141415" src="https://github.com/user-attachments/assets/a7dd5948-681a-41e9-987c-a14b349bdab6" />
+</p>
+<p float="left">
+<img width=48% height=auto alt="Screenshot 2026-09-26 141209" src="https://github.com/user-attachments/assets/24c669b9-9775-4b19-a639-32d296efe339" />
+<img width=48% height=auto alt="Screenshot 2026-09-26 141256" src="https://github.com/user-attachments/assets/583feb5e-cf8e-4858-9ebe-5acd58045041" />
+</p>
 
 ## Overview
 
