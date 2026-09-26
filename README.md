@@ -40,6 +40,65 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
+## Shape Recognition
+
+Shape classification identifies and categorizes geometric shapes using contour-based feature extraction and machine learning classifiers.
+
+### Supported Shapes
+
+- Circle
+- Square
+- Rectangle
+- Triangle
+- Pentagon
+- Hexagon
+- Star
+- Ellipse
+
+### How It Works
+
+1. Synthetic training data is generated for each shape class.
+2. Contour-based geometric descriptors are extracted from the images.
+3. A model such as Decision Tree, KNN, Random Forest, or SVM is trained on the features.
+4. New uploaded images are classified based on their extracted shape descriptors.
+5. The app displays the predicted class and the processing pipeline.
+
+### Training
+
+Run the shape training script:
+
+```bash
+python shape_recognition.py
+```
+
+This generates synthetic shape data and saves trained model files using `joblib`.
+
+## Emoji Recognition
+
+Emoji recognition uses HOG-based visual features to classify emoji-like images and other stylized symbols.
+
+### How It Works
+
+1. Emoji images are processed to extract HOG features.
+2. Those features capture the gradient structure and local shape patterns.
+3. A classifier is trained to learn the mapping from feature vectors to emoji classes.
+4. Uploaded emoji images are classified by the trained model.
+5. The app displays the prediction, confidence, and processing steps.
+
+### Dataset
+
+The project includes a sample emoji dataset in `my_emojis.zip` for experimentation and model training.
+
+### Training
+
+Run the emoji model training script:
+
+```bash
+python emoji_classifier.py
+```
+
+This trains and evaluates the classifier on the emoji dataset.
+
 ## Running the App
 
 Start the Streamlit application:
@@ -49,15 +108,6 @@ streamlit run intrfc.py
 ```
 
 Then open the local URL shown in the terminal (usually `http://localhost:8501`).
-
-## How It Works
-
-1. Images are uploaded through the Streamlit interface.
-2. Relevant features are extracted depending on the selected project:
-   - Shape Prediction: contour-based geometric descriptors
-   - Emoji Prediction: HOG features
-3. The selected trained model predicts the class.
-4. The app shows the prediction, confidence, and processing pipeline.
 
 ## Notes
 
